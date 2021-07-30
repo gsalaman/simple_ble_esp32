@@ -77,6 +77,11 @@ void setup()
   pDialChar->setCallbacks(new DialCB());
   init_value[0]=0;
   pDialChar->setValue(init_value, 1);
+
+  pService->start();
+  
+  BLEAdvertising *pAdvertising = pServer->getAdvertising();
+  pAdvertising->start();
 }
 
 void loop() 
