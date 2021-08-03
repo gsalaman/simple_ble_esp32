@@ -1,11 +1,11 @@
 # ESP32 Bluetooth Low Energy (BLE) Server Example
-This repo demonstrates how to make a BLE server out of an ESP32.
+This repo demonstrates how to make a BLE server out of an ESP32.  We'll be transferring a simple piece of data (a "dial value", ranging from 0 to 9) between devices.
 
 ## BLE Overview
 Standard Bluetooth is typically used when streaming data is needed...for example, a wireless headset.  This connection consumes a fair amount of power.  Bluetooth Low Energy (BLE) was added to the standard in order to facilitate short, energy-efficent data transfers.  
 
 ## Technology Tradeoffs
-We're going to use BLE to provide a point-to-point connection, via a client-server model.  If you are looking for a many-to-one or many-to-many network, this strategy may not be best for your project; something like MQTT may be better.
+BLE provides a point-to-point connection via a client-server model.  If you are looking for a many-to-one or many-to-many network, this strategy may not be best for your project; something like MQTT may be better.
 
 The main "pro" of using BLE is that this connection is "paired"...there's no network setup involved like with MQTT over WiFi.
 
