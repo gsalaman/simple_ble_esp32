@@ -8,7 +8,7 @@
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
-#define SERVICE_UUID          "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define SERVICE_UUID          "62a26d83-4fc6-4e00-b4ef-dc14244d1868"
 #define DIAL_CHAR_UUID        "65b2dc13-930a-4439-b23e-ea853302d6db"
 
 int dial_val;
@@ -80,8 +80,12 @@ void setup()
 
   pService->start();
   
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
 }
 
 void loop() 
