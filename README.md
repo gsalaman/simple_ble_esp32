@@ -18,7 +18,7 @@ For this project, I'm going to make a simple Service that contains only one char
 
 Note that the Bluetooth SIG defines "Profiles" as well...these are industry-standard collections of services.  For example, there is a "heart rate monitor" profile that describes which services should be supported in an industry standard heart rate monitor.  Check out https://www.bluetooth.com/specifications/gatt for more info.
 
-## Implementation
+## Using the Arduino Library
 Each Service and Characteristic needs a UUID.  For the industry standard ones, you reference the official specifications, but this project here "user defined".  There's a website that lets you generate UUIDs (https://www.uuidgenerator.net/)
 
 The arduino BLE libraries let you specify Callbacks for each service and characteristic.  I've currently got a "connect and disconnect" callback for the server, and then "Write" callback for the characteristc that sets the dial variable.
@@ -194,6 +194,21 @@ Next, we start the service:
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
 ```
+
+## Testing
+Okay, so how does this work?  I'm going to use BlueSee on my Mac to scan, read, and set the characteristic.  You can get it through the app store for mac, or install it for windows here:
+https://pcmacstore.com/en/app/1336679524/bluesee-ble-debugger
+
+Download and run the sketch on the ESP32, and then bring up the BlueSee app.  
+
+In th4e upper-left, you'll see a scan button.  Press that, and BlueSee will scan for all the bluetooth devices in the area.  It should find one with the name "ESP32 Dial Example".  Double click on that entry, and then click the "connect" button on the top-left. 
+
+Next, click on the service in the left pane...and this is a little crypic, as it's that UUID (`62A6...`etc).  It reads the characteristic (Look!  It's zero!)...and we can read or write it in either ascii or hex.   We want ascii, so click the "hex" slider on the right, and it'll switch to ascii.
+
+Now type a 1 in the text box, and click "write".  
+
+The characteristic should update on the arduino!
+
 
 
 
