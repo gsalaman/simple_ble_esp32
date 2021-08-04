@@ -102,7 +102,98 @@ If you look at the implementation of this function, you'll see that this library
 
 Then we convert that string to a number via the `atoi` function.  `atoi` is "Ascii-to-integer"....it takes our input string and returns an integer.  We then check to make sure the integer  is in our expected range (0-9)  before setting our  global variable for the Dial.
 
+To initialize all this, we need to add some code to our setup function.  Remember that we're going to be creating a server with one 
+service.  That service will contain one characteristic.  Here's what it looks like:
+```
+void setup() 
+{
+  int i;
+  uint8_t init_value[1];
+  
+  Serial.begin(115200);
+  
+  
+  BLEDevice::init("ESP32 Dial Example");
+  BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
 
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  BLECharacteristic *pDialChar = pService->createCharacteristic(
+                                         DIAL_CHAR_UUID,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+                                       
+                                                                                                                 
+  pDialChar->setCallbacks(new DialCB());
+  init_value[0]=0;
+  pDialChar->setValue(init_value, 1);
+
+  pService->start();
+  
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+  ```
+  Lets walk through this a little at a time.
+  
+  `BLEDevice::init("ESP32 Dial Example");` is what starts our device, and the string (`"ESP32 Dial Example"`) is the name you'll see when scanning for that device.
+  
+  We then create a server and attach those previously defined server callbacks:
+  ```
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+ ```
+  `pServer` is a pointer to that newly created service (hence the asterisk)
+ 
+
+ Note that `MyServerCallbacks` matches the  name we used when doing the server callback subclass.
+ 
+ Next, we create the service inside the server:
+ ```
+   BLEService *pService = pServer->createService(SERVICE_UUID);
+ ```
+ `pService` is a pointer to that newly created service (hence the asterisk).  We're linking it to our server (`pServer`).
+ 
+ And then create a single characteristic in that service:
+ ```
+   BLECharacteristic *pDialChar = pService->createCharacteristic(
+                                         DIAL_CHAR_UUID,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+``` 
+Like with the server and service, we're creating a pointer to our characteristic (`pDialChar'), which we link to our service (`pService').
+Next, we hook in our callback to that characteristic:
+```
+  pDialChar->setCallbacks(new DialCB());
+```
+
+The next bit initializes our characteristic to a known value:
+```
+  init_value[0]=0;
+  pDialChar->setValue(init_value, 1);
+```
+You can think of a characteristic as a byte array...we're only using one byte (the zeroth element) and initalizing it to zero.  The `1` in `setValue` tells our characteristic to only set one byte...it's the length of our array.
+
+Next, we start the service:
+```
+  pService->start();
+```
+
+...and turn on advertising, so that our device is discoverable when you scan for bluetooth.
+```
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+```
 
 
 
